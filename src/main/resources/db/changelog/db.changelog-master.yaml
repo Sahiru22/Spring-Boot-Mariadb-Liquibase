@@ -1,0 +1,143 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: sahiru
+      changes:
+        - createTable:
+            tableName: buses
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: registration_no
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: owner_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 2
+      author: sahiru
+      changes:
+        - createTable:
+            tableName: bus_employees
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: employment_type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bus_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 3
+      author: sahiru
+      changes:
+        - createTable:
+            tableName: bus_owners
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+
+  - changeSet:
+      id: 4
+      author: sahiru
+      changes:
+        - createTable:
+            tableName: routes
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+
+  - changeSet:
+      id: 5
+      author: sahiru
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: buses
+            baseColumnNames: owner_id
+            referencedTableName: bus_owners
+            referencedColumnNames: id
+            constraintName: fk_buses_owner
+            onDelete: SET NULL
+        - addForeignKeyConstraint:
+            baseTableName: bus_employees
+            baseColumnNames: bus_id
+            referencedTableName: buses
+            referencedColumnNames: id
+            constraintName: fk_bus_employees_bus
+            onDelete: CASCADE
+
+  - changeSet:
+      id: 6
+      author: sahiru
+      changes:
+        - createTable:
+            tableName: bus_routes
+            columns:
+              - column:
+                  name: bus_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: route_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: bus_routes
+            columnNames: bus_id, route_id
+            constraintName: pk_bus_routes
+        - addForeignKeyConstraint:
+            baseTableName: bus_routes
+            baseColumnNames: bus_id
+            referencedTableName: buses
+            referencedColumnNames: id
+            constraintName: fk_bus_routes_bus
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: bus_routes
+            baseColumnNames: route_id
+            referencedTableName: routes
+            referencedColumnNames: id
+            constraintName: fk_bus_routes_route
+            onDelete: CASCADE
+
