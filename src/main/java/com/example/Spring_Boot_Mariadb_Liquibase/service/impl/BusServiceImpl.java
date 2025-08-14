@@ -3,7 +3,11 @@ package com.example.Spring_Boot_Mariadb_Liquibase.service.impl;
 import com.example.Spring_Boot_Mariadb_Liquibase.controller.request.BusRequest;
 import com.example.Spring_Boot_Mariadb_Liquibase.controller.response.BusResponse;
 import com.example.Spring_Boot_Mariadb_Liquibase.model.Bus;
+import com.example.Spring_Boot_Mariadb_Liquibase.model.BusOwner;
+import com.example.Spring_Boot_Mariadb_Liquibase.model.Route;
+import com.example.Spring_Boot_Mariadb_Liquibase.repository.BusOwnerRepository;
 import com.example.Spring_Boot_Mariadb_Liquibase.repository.BusRepository;
+import com.example.Spring_Boot_Mariadb_Liquibase.repository.RouteRepository;
 import com.example.Spring_Boot_Mariadb_Liquibase.service.BusService;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +22,8 @@ import org.springframework.stereotype.Service;
 public class BusServiceImpl implements BusService {
 
   private final BusRepository busRepository;
+  private final BusOwnerRepository busOwnerRepository;
+  private final RouteRepository routeRepository;
 
   @Override
   public BusResponse create(BusRequest request) {
@@ -25,11 +31,23 @@ public class BusServiceImpl implements BusService {
     Bus bus = new Bus();
     bus.setRegistrationNo(request.getRegistrationNo());
 
+    BusOwner busOwner = busOwnerRepository.findById(request.getOwnerId())
+        .orElseThrow(
+            () -> new RuntimeException("Owner not found with ID: " + request.getOwnerId()));
+    bus.setOwner(busOwner);
+
+    if (request.getRouteIds() != null && !request.getRouteIds().isEmpty()) {
+      List<Route> routes = routeRepository.findAllById(request.getRouteIds());
+      if (routes.size() != request.getRouteIds().size()) {
+        throw new RuntimeException("Some routes not found for given IDs");
+      }
+      bus.setRoutes(routes);
+    }
+
     busRepository.save(bus);
 
     BusResponse response = new BusResponse();
     response.setId(bus.getId());
-    response.setRegistrationNo(bus.getRegistrationNo());
 
     log.info("Bus added successfully. Bus ID: {}", bus.getId());
 
@@ -47,7 +65,6 @@ public class BusServiceImpl implements BusService {
       BusResponse response = new BusResponse();
 
       response.setId(bus.getId());
-      response.setRegistrationNo(bus.getRegistrationNo());
 
       createBusResponseList.add(response);
     }
@@ -67,8 +84,6 @@ public class BusServiceImpl implements BusService {
       BusResponse response = new BusResponse();
 
       response.setId(bus.getId());
-      response.setRegistrationNo(bus.getRegistrationNo());
-
       return response;
     }
     return null;
@@ -85,6 +100,19 @@ public class BusServiceImpl implements BusService {
 
       bus.setId(request.getId());
       bus.setRegistrationNo(request.getRegistrationNo());
+
+      BusOwner busOwner = busOwnerRepository.findById(request.getOwnerId())
+          .orElseThrow(
+              () -> new RuntimeException("Owner not found with ID: " + request.getOwnerId()));
+      bus.setOwner(busOwner);
+
+      if (request.getRouteIds() != null && !request.getRouteIds().isEmpty()) {
+        List<Route> routes = routeRepository.findAllById(request.getRouteIds());
+        if (routes.size() != request.getRouteIds().size()) {
+          throw new RuntimeException("Some routes not found for given IDs");
+        }
+        bus.setRoutes(routes);
+      }
 
       busRepository.save(bus);
     }

@@ -6,6 +6,4 @@ import lombok.Data;
 public class BusResponse {
 
   private Long id;
-
-  private String registrationNo;
 }
