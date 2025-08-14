@@ -8,5 +8,4 @@ public class BusRequest {
   private Long id;
 
   private String registrationNo;
-
 }
