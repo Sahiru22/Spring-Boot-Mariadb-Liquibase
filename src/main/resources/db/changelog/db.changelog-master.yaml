@@ -140,4 +140,3 @@ databaseChangeLog:
             referencedColumnNames: id
             constraintName: fk_bus_routes_route
             onDelete: CASCADE
-
